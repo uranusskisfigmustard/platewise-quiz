@@ -98,10 +98,62 @@
     .rack-dot:after { content:""; border-radius:50%; width:11px; height:11px; background:#b7c3bb; box-shadow: inset 0 0 0 2px #5c6862; }
     .rack-btn[data-weight="1.25"] { grid-column:span 2; min-height:75px; }
     .rack-btn[data-weight="1.25"] .rack-dot { width:43px; height:43px; }
+    .rack-quantity { display:inline-flex; align-items:center; justify-content:center; margin-top:6px; min-width:27px; min-height:24px; padding:2px 7px; border-radius:999px; background:var(--lime); color:#19251a; font-size:.78rem; font-weight:900; font-variant-numeric:tabular-nums; }
+    .rack-quantity[hidden] { display:none; }
+    .selected-area { margin-top:17px; padding:15px; border:1px solid #506153; border-radius:12px; background:#16231a; }
+    .selected-header { display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:11px; }
+    .selected-header strong { font-size:.9rem; }
+    .selected-header span { font-size:.75rem; color:var(--muted); }
+    .selected-chips { display:flex; flex-wrap:wrap; gap:8px; min-height:37px; align-items:center; }
+    .selected-empty { color:var(--muted); font-size:.84rem; }
+    .selected-chip { display:inline-flex; align-items:center; justify-content:center; gap:6px; min-height:43px; padding:8px 11px; border:1px solid #60745c; border-radius:9px; background:#263c2b; color:var(--ink); font-weight:800; font-variant-numeric:tabular-nums; touch-action:manipulation; }
+    .selected-chip span { color:var(--lime); font-size:1.1rem; }
+    .selected-chip:disabled { opacity:.62; }
+    .rack-clear { margin-top:12px; padding:8px 0; min-height:36px; border:0; background:none; color:#c2d4be; text-decoration:underline; text-underline-offset:4px; font-size:.83rem; }
+    .rack-clear:disabled { opacity:.45; }
     .rack-callout { border:1px dashed #526554; background:#1c2a21; padding:16px 17px; border-radius:12px; margin-top:21px; font-size:.82rem; color:#b8c8b9; }
     .rack-callout strong { color:var(--lime); }
     .mobile-hud, .mobile-check { display:none; }
     footer { padding:32px 0 45px; font-size:.76rem; color:#8d9c91; display:flex; justify-content:space-between; gap:15px; flex-wrap:wrap; }
+    @media (min-width:961px) {
+      .target-card { grid-column:1; grid-row:1; }
+      .bar-card { grid-column:1; grid-row:2; }
+      .rack-card { grid-column:2; grid-row:1 / span 2; }
+    }
+    @media (max-width:960px) {
+      .target-card { grid-column:1; grid-row:1; }
+      .rack-card { grid-column:1; grid-row:2; }
+      .bar-card { grid-column:1; grid-row:3; }
+    }
+    @media (max-width:640px) {
+      .workspace { gap:12px; }
+      .topbar { gap:8px; }
+      .brand { font-size:.94rem; }
+      .intro { padding:20px 0 18px; gap:15px; }
+      .intro h1 { font-size:clamp(1.8rem,7.5vw,2.55rem); }
+      .lede { margin-top:10px; }
+      .rack-header h2 { font-size:1.45rem; }
+      .rack-header p { margin-bottom:13px; }
+      .rack-btn { min-height:78px; padding:10px; touch-action:manipulation; }
+      .rack-btn strong { font-size:1.35rem; }
+      .rack-dot { width:43px; height:43px; border-width:4px; }
+      .rack-btn[data-weight="1.25"] { min-height:66px; }
+      .selected-chip, .rack-btn, .mounted, .primary, .secondary { -webkit-tap-highlight-color: transparent; }
+      .mobile-check { bottom:max(12px,env(safe-area-inset-bottom)); min-height:55px; touch-action:manipulation; }
+      body { padding-bottom:calc(85px + env(safe-area-inset-bottom)); }
+      .target strong { font-size:clamp(3.45rem,15vw,5.1rem); }
+      .target small { font-size:1.2rem; }
+      .below-sleeve { flex-wrap:wrap; line-height:1.4; }
+      .mobile-hud { padding:9px 12px; }
+      .mobile-hud span:last-child { text-align:right; }
+    }
+    @media (max-width:359px) {
+      .top-note { display:none; }
+      .rack-dot { width:35px; height:35px; }
+      .rack-btn strong { font-size:1.23rem; }
+      .rack-btn { padding:9px; }
+      .score { min-width:70px; padding:8px 9px; }
+    }
     @media (max-width:960px) { .workspace { grid-template-columns:1fr; } .intro { align-items:flex-start; flex-direction:column; padding-top:32px; } .scores { align-self:flex-start; } .rack { grid-template-columns: repeat(4,minmax(0,1fr)); } .rack-btn { padding:12px; } .rack-btn[data-weight="1.25"] { grid-column:span 2; } }
     @media (max-width:640px) { .mobile-hud { display:flex; position:sticky; top:0; z-index:15; align-items:center; justify-content:space-between; gap:12px; padding:10px 16px; margin:0 -13px; background:#243329; border-bottom:1px solid #526448; box-shadow:0 5px 16px #0006; font-weight:850; font-size:.87rem; } .mobile-hud strong { font-size:1.26rem; color:var(--lime); font-variant-numeric:tabular-nums; } .mobile-hud span:last-child { font-size:.75rem; color:#bbcbbc; font-weight:700; } .mobile-check { display:block; position:fixed; bottom:13px; left:13px; right:13px; width:calc(100% - 26px); z-index:20; padding:15px; background:var(--lime); color:#182319; font-weight:850; border:1px solid #e2ffa1; border-radius:11px; box-shadow:0 10px 30px #000b; } body {padding-bottom:78px;} .shell { width:min(100% - 26px,1200px); } .topbar { padding:20px 0; } .top-note { font-size:.59rem; text-align:right; } .intro { padding:28px 0 22px; } h1 { font-size:2.55rem; } .lede { font-size:.93rem; } .score { min-width:77px; padding:10px 12px; } .card-content { padding:19px; } .target strong { font-size:5.1rem; } .rack { grid-template-columns:repeat(2,minmax(0,1fr)); } .rack-btn[data-weight="1.25"] { grid-column:span 2; } .sleeve-well { min-height:195px; padding:12px 8px; } .bar-inner { flex-basis:32px; } .mounted { max-height:143px; } .actions { flex-direction:column; } .primary { min-height:56px; } .secondary { min-height:46px; } }
     @media (prefers-reduced-motion: reduce) { *,*:before,*:after { transition:none!important; scroll-behavior:auto!important; } }
@@ -129,7 +181,7 @@
     </section>
 
     <main class="workspace">
-      <section class="card" aria-label="Quiz">
+      <section class="card target-card" aria-label="Quiz target">
         <div class="card-content">
           <div class="section-heading"><span class="section-label">01 / Your target</span><span class="tiny-tag">45 LB BAR</span></div>
           <div class="target" aria-live="polite"><strong id="target">135</strong><small>LB</small></div>
@@ -144,10 +196,13 @@
             </div>
           </div>
 
-          <div class="splitter"></div>
+        </div>
+      </section>
+      <section class="card bar-card" aria-label="Loaded barbell and answer">
+        <div class="card-content">
           <div class="section-heading"><span class="section-label">02 / Your bar</span><span class="tiny-tag">ONE SIDE ONLY</span></div>
           <p class="loading-instruction">Load the plates on this sleeve</p>
-          <p class="loading-detail">Tap a plate on the right to add it. Tap any plate on the bar to remove one.</p>
+          <p class="loading-detail">Select a plate from the rack to add it. Tap any plate on the bar to remove one.</p>
           <div class="sleeve-well" aria-label="Visual of one loaded barbell sleeve">
             <div class="bar-inner" aria-hidden="true"></div>
             <div class="stopper" aria-hidden="true"></div>
@@ -168,7 +223,7 @@
         </div>
       </section>
 
-      <aside class="card" aria-label="Plate rack">
+      <aside class="card rack-card" aria-label="Plate rack">
         <div class="card-content">
           <div class="rack-header">
             <span class="section-label">03 / Plate rack</span>
@@ -183,6 +238,11 @@
             <button class="rack-btn" type="button" data-weight="5" aria-label="Add 5 pound plate"><span><strong>5</strong><small>ADD PLATE +</small></span><i class="rack-dot" aria-hidden="true" style="background:#c96360"></i></button>
             <button class="rack-btn" type="button" data-weight="2.5" aria-label="Add 2.5 pound plate"><span><strong>2.5</strong><small>ADD PLATE +</small></span><i class="rack-dot" aria-hidden="true" style="background:#839498"></i></button>
             <button class="rack-btn" type="button" data-weight="1.25" aria-label="Add 1.25 pound plate"><span><strong>1.25</strong><small>ADD PLATE +</small></span><i class="rack-dot" aria-hidden="true" style="background:#b77d95"></i></button>
+          </div>
+          <div class="selected-area" aria-label="Selected plates">
+            <div class="selected-header"><strong>Plates on this side</strong><span>Tap a plate to remove it</span></div>
+            <div id="selected-chips" class="selected-chips"><span class="selected-empty">No plates added yet</span></div>
+            <button type="button" id="rack-clear" class="rack-clear" disabled>Clear all plates</button>
           </div>
           <div class="rack-callout"><strong>The rule:</strong> Total weight = 45 lb bar + 2 × the plates you load on this side. Standard questions rarely require the small fractional plates.</div>
         </div>
@@ -209,7 +269,7 @@
       standard: { min:95, max:315 },
       heavy: { min:225, max:495 }
     };
-    const els = Object.fromEntries(['target','mounted-plates','plate-count','feedback','check','clear','reveal','solved','streak','best','rack','live-toggle','live-weight','mobile-target','mobile-plates','mobile-check'].map(id => [id, document.getElementById(id)]));
+    const els = Object.fromEntries(['target','mounted-plates','plate-count','feedback','check','clear','reveal','solved','streak','best','rack','live-toggle','live-weight','mobile-target','mobile-plates','mobile-check','selected-chips','rack-clear'].map(id => [id, document.getElementById(id)]));
     let difficulty = 'standard';
     let target = 135;
     let loaded = [];
@@ -244,6 +304,37 @@
       }
       els['plate-count'].textContent = `${loaded.length} plate${loaded.length === 1 ? '' : 's'} loaded`;
       els['mobile-plates'].textContent = `${loaded.length} plate${loaded.length === 1 ? '' : 's'} selected`;
+      // Keep removal controls adjacent to the rack for easy phone use.
+      els['selected-chips'].replaceChildren();
+      if (!loaded.length) {
+        const emptyChip=document.createElement('span');
+        emptyChip.className='selected-empty';
+        emptyChip.textContent='No plates added yet';
+        els['selected-chips'].append(emptyChip);
+      } else {
+        const counts=new Map();
+        loaded.forEach(w=>counts.set(w,(counts.get(w)||0)+1));
+        [...counts.entries()].sort((a,b)=>b[0]-a[0]).forEach(([w,count])=>{
+          const chip=document.createElement('button');
+          chip.type='button'; chip.className='selected-chip';
+          chip.textContent=`${nice(w)} lb × ${count} `;
+          const x=document.createElement('span'); x.textContent='×'; x.setAttribute('aria-hidden','true'); chip.append(x);
+          chip.setAttribute('aria-label',`Remove one ${nice(w)} pound plate (${count} loaded)`);
+          chip.disabled=finished;
+          chip.addEventListener('click',()=>removePlate(w));
+          els['selected-chips'].append(chip);
+        });
+      }
+      els['rack-clear'].disabled = finished || !loaded.length;
+      els.rack.querySelectorAll('[data-weight]').forEach(button=>{
+        const w=Number(button.dataset.weight);
+        const count=loaded.filter(p=>p===w).length;
+        let quantity=button.querySelector('.rack-quantity');
+        if(!quantity){quantity=document.createElement('span'); quantity.className='rack-quantity'; button.querySelector('span').append(quantity);}
+        quantity.hidden=count===0;
+        quantity.textContent=`×${count}`;
+        button.setAttribute('aria-label',`Add ${nice(w)} pound plate, ${count} currently loaded`);
+      });
       els.check.textContent = finished ? 'Next target →' : 'Check my load →';
       els['mobile-check'].textContent = finished ? 'Next target →' : 'Check my load →';
       els.clear.disabled = finished || !loaded.length;
@@ -317,7 +408,9 @@
     els.rack.querySelectorAll('[data-weight]').forEach(button => button.addEventListener('click',()=>addPlate(Number(button.dataset.weight))));
     els.check.addEventListener('click',check);
     els['mobile-check'].addEventListener('click',()=>{ const previouslyFinished=finished; check(); if(previouslyFinished) window.scrollTo({top:0,behavior:'smooth'}); else els.feedback.scrollIntoView({behavior:'smooth',block:'center'}); });
-    els.clear.addEventListener('click',()=>{loaded=[];render(); feedback('Bar cleared. Choose your plates.');});
+    function clearPlates(){ if(finished) return; loaded=[]; render(); feedback('Bar cleared. Choose your plates.'); }
+    els.clear.addEventListener('click',clearPlates);
+    els['rack-clear'].addEventListener('click',clearPlates);
     els.reveal.addEventListener('click',reveal);
     els['live-toggle'].addEventListener('change',render);
     document.querySelectorAll('[data-difficulty]').forEach(button=>button.addEventListener('click',()=>{
