@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#101614" />
+  <meta name="description" content="A one-sided barbell plate loading quiz in pounds. Practice plate math without a calculator." />
+  <title>Platewise — Barbell Loading Quiz</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #101614;
+      --panel: #1a2420;
+      --panel-2: #202d27;
+      --border: #36453c;
+      --ink: #f0f4ec;
+      --muted: #a1b2a5;
+      --lime: #d9fb7f;
+      --lime-dark: #1f3220;
+      --red: #ff967f;
+      --shadow: 0 25px 70px rgba(0,0,0,.24);
+    }
+    * { box-sizing: border-box; }
+    body { margin:0; min-height:100vh; background: radial-gradient(circle at 87% 0%, #233a2a 0%, transparent 33%), var(--bg); color: var(--ink); font: 16px/1.5 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+    button { font:inherit; cursor:pointer; }
+    button:focus-visible, select:focus-visible { outline:3px solid var(--lime); outline-offset:3px; }
+    button:disabled { cursor:not-allowed; opacity:.52; }
+    .shell { width:min(1200px, calc(100% - 40px)); margin:0 auto; }
+    .topbar { display:flex; justify-content:space-between; align-items:center; padding:27px 0 22px; border-bottom:1px solid #334238; gap:16px; }
+    .brand { display:flex; align-items:center; gap:12px; font-weight:850; letter-spacing:.07em; font-size:1.04rem; }
+    .brand-logo { display:flex; gap:3px; align-items:center; height:32px; padding:0 7px; border:2px solid var(--lime); border-radius:8px; }
+    .brand-logo i { display:block; width:6px; border-radius:2px; background:var(--lime); height:19px; }
+    .brand-logo i:nth-child(2) { height:26px; }
+    .brand-logo i:nth-child(3) { height:14px; }
+    .top-note { font-size:.72rem; font-weight:800; letter-spacing:.15em; text-transform:uppercase; color:var(--muted); }
+    .intro { display:flex; justify-content:space-between; align-items:flex-end; gap:24px; padding:44px 0 30px; }
+    .eyebrow { color:var(--lime); font-weight:800; letter-spacing:.18em; text-transform:uppercase; font-size:.76rem; margin:0 0 12px; }
+    h1 { font-size:clamp(2.5rem,5vw,4.3rem); line-height:1.03; letter-spacing:-.065em; margin:0; max-width:730px; font-weight:850; }
+    .lede { color:var(--muted); margin:16px 0 0; max-width:630px; font-size:1.02rem; }
+    .scores { display:flex; gap:11px; align-self:flex-end; }
+    .score { min-width:90px; text-align:center; padding:12px 15px; border:1px solid var(--border); border-radius:12px; background:#19241e; }
+    .score b { display:block; font-weight:850; font-size:1.5rem; line-height:1.1; font-variant-numeric:tabular-nums; }
+    .score span { display:block; font-size:.7rem; letter-spacing:.09em; text-transform:uppercase; font-weight:750; color:var(--muted); padding-top:5px; }
+    .workspace { display:grid; grid-template-columns: minmax(0, 1.2fr) minmax(335px, .8fr); gap:18px; }
+    .card { background:var(--panel); border:1px solid var(--border); border-radius:18px; box-shadow:var(--shadow); min-width:0; }
+    .card-content { padding:27px; }
+    .section-heading { display:flex; justify-content:space-between; align-items:center; gap:10px; }
+    .section-label { font-size:.72rem; font-weight:850; letter-spacing:.15em; color:var(--muted); text-transform:uppercase; }
+    .tiny-tag { font-size:.71rem; letter-spacing:.08em; font-weight:850; color:var(--lime); background:#2a3c2b; padding:5px 9px; border:1px solid #44563b; border-radius:6px; text-transform:uppercase; }
+    .target { display:flex; align-items:baseline; gap:11px; margin:16px 0 5px; }
+    .target strong { font-size:clamp(4.8rem,9vw,7rem); letter-spacing:-.09em; line-height:1.04; font-weight:900; font-variant-numeric:tabular-nums; }
+    .target small { font-size:1.6rem; font-weight:800; color:var(--lime); }
+    .subtext { color:var(--muted); margin:0; }
+    .difficulty-wrap { margin-top:27px; display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+    .difficulty-wrap label { font-size:.73rem; color:var(--muted); font-weight:850; letter-spacing:.12em; text-transform:uppercase; }
+    .segment { display:flex; gap:4px; padding:4px; border:1px solid #465748; border-radius:10px; background:#131d17; flex-wrap:wrap; }
+    .segment button { border:0; border-radius:7px; background:transparent; color:#b3c0b5; padding:8px 13px; font-weight:750; font-size:.83rem; }
+    .segment button[aria-pressed="true"] { background:var(--lime); color:#17231b; }
+    .splitter { height:1px; background:var(--border); margin:27px 0; }
+    .loading-instruction { margin:10px 0 4px; font-weight:800; font-size:1.12rem; }
+    .loading-detail { margin:0; color:var(--muted); font-size:.88rem; }
+    .sleeve-well { position:relative; width:100%; min-height:230px; display:flex; align-items:center; margin:20px 0 14px; border-radius:13px; overflow-x:auto; overflow-y:hidden; padding:16px 18px; background:repeating-linear-gradient(0deg,rgba(255,255,255,.019) 0,rgba(255,255,255,.019) 1px,transparent 1px,transparent 30px),#141e19; border:1px solid #2d3f33; scrollbar-color:#68816b #17251c; }
+    .sleeve-well:before { content:""; position:absolute; left:0; right:0; top:50%; height:16px; background:linear-gradient(#8b9d9e,#dee9df 45%,#9ca9a2 55%,#607275); transform:translateY(-50%); box-shadow:0 3px 7px #0008; }
+    .bar-inner { z-index:1; flex:0 0 90px; height:28px; background:repeating-linear-gradient(90deg,transparent 0,transparent 5px,#566260 6px,transparent 7px),linear-gradient(#71847c,#d4ddd6 48%,#73847d); border-right:8px solid #d6dfd4; box-shadow:4px 0 0 #707f77; }
+    .stopper { z-index:1; flex:0 0 13px; height:87px; border-radius:3px; background:linear-gradient(90deg,#87978b,#eff7e8,#6f7e76); box-shadow:3px 0 4px #0008; }
+    .sleeve-plates { z-index:2; display:flex; align-items:center; flex:0 0 auto; gap:2px; min-height:160px; }
+    .sleeve-empty { transform:translateY(-45px); color:#8f9f91; font-size:.75rem; font-weight:850; letter-spacing:.14em; margin-left:34px; white-space:nowrap; }
+    .mounted { position:relative; display:flex; justify-content:center; align-items:center; flex:0 0 auto; border-radius:7px; color:#fff; text-shadow:0 1px 2px #0007; font-size:.82rem; font-weight:900; border:2px solid rgba(255,255,255,.25); border-left:4px solid rgba(255,255,255,.33); box-shadow:inset -6px 0 0 #0002,4px 2px 8px #0004; transition: transform .12s ease; }
+    .mounted:hover { transform:translateY(-5px); }
+    .mounted span { transform:rotate(-90deg); white-space:nowrap; }
+    .sleeve-end { z-index:1; flex:0 0 12px; height:28px; background:linear-gradient(#9faea7,#d9e2db,#76857e); border-radius:0 5px 5px 0; }
+    .below-sleeve { display:flex; justify-content:space-between; gap:8px; font-size:.76rem; color:var(--muted); }
+    .plate-count { color:var(--lime); font-weight:750; }
+    .feedback { margin:22px 0 0; padding:13px 15px; border-radius:10px; background:#24332a; border:1px solid #445a47; font-size:.9rem; min-height:52px; display:flex; align-items:center; }
+    .feedback[data-state="success"] { background:#273e28; color:#dcffbc; border-color:#66875c; }
+    .feedback[data-state="error"] { background:#402a26; color:#ffd4c9; border-color:#805249; }
+    .feedback[data-state="reveal"] { background:#323328; color:#fff1c2; border-color:#665f3c; }
+    .actions { display:flex; gap:10px; margin-top:16px; }
+    .primary, .secondary, .text-button { display:inline-flex; justify-content:center; align-items:center; gap:8px; border-radius:10px; padding:15px 18px; font-weight:850; }
+    .primary { flex:1; background:var(--lime); border:1px solid var(--lime); color:#182319; }
+    .primary:hover:not(:disabled) { background:#e6ffa7; }
+    .secondary { background:#26332a; border:1px solid #506153; color:var(--ink); }
+    .secondary:hover:not(:disabled) { background:#314138; }
+    .text-button { background:none; padding:9px; border:0; color:#c4d3c4; text-decoration:underline; text-underline-offset:4px; font-size:.84rem; }
+    .extra-actions { display:flex; align-items:center; justify-content:space-between; gap:14px; margin-top:8px; flex-wrap:wrap; }
+    .toggle { display:flex; align-items:center; gap:8px; font-size:.84rem; color:var(--muted); cursor:pointer; }
+    .toggle input { accent-color:var(--lime); width:17px; height:17px; }
+    .live-weight { font-size:.82rem; color:var(--lime); font-variant-numeric:tabular-nums; min-width:100px; text-align:right; }
+    .rack-header h2 { margin:6px 0 5px; font-size:1.8rem; line-height:1.12; letter-spacing:-.04em; }
+    .rack-header p { color:var(--muted); font-size:.9rem; margin:0 0 23px; }
+    .rack { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:11px; }
+    .rack-btn { border:1px solid #485a4c; background:var(--panel-2); border-radius:12px; padding:15px 12px; display:flex; justify-content:space-between; align-items:center; gap:8px; color:var(--ink); min-height:96px; transition:background .13s, border-color .13s,transform .13s; }
+    .rack-btn:hover:not(:disabled) { background:#304337; border-color:#9fbd94; transform:translateY(-2px); }
+    .rack-btn:active:not(:disabled) { transform:translateY(0); }
+    .rack-btn strong { font-size:1.45rem; letter-spacing:-.055em; line-height:1; }
+    .rack-btn small { display:block; color:#adbdaf; font-size:.7rem; font-weight:750; margin-top:7px; text-align:left; }
+    .rack-dot { border-radius:50%; border:5px solid #ffffff28; box-shadow:inset 0 0 0 3px #0003, 0 4px 7px #0003; width:55px; height:55px; flex-shrink:0; display:grid; place-items:center; }
+    .rack-dot:after { content:""; border-radius:50%; width:11px; height:11px; background:#b7c3bb; box-shadow: inset 0 0 0 2px #5c6862; }
+    .rack-btn[data-weight="1.25"] { grid-column:span 2; min-height:75px; }
+    .rack-btn[data-weight="1.25"] .rack-dot { width:43px; height:43px; }
+    .rack-callout { border:1px dashed #526554; background:#1c2a21; padding:16px 17px; border-radius:12px; margin-top:21px; font-size:.82rem; color:#b8c8b9; }
+    .rack-callout strong { color:var(--lime); }
+    .mobile-hud, .mobile-check { display:none; }
+    footer { padding:32px 0 45px; font-size:.76rem; color:#8d9c91; display:flex; justify-content:space-between; gap:15px; flex-wrap:wrap; }
+    @media (max-width:960px) { .workspace { grid-template-columns:1fr; } .intro { align-items:flex-start; flex-direction:column; padding-top:32px; } .scores { align-self:flex-start; } .rack { grid-template-columns: repeat(4,minmax(0,1fr)); } .rack-btn { padding:12px; } .rack-btn[data-weight="1.25"] { grid-column:span 2; } }
+    @media (max-width:640px) { .mobile-hud { display:flex; position:sticky; top:0; z-index:15; align-items:center; justify-content:space-between; gap:12px; padding:10px 16px; margin:0 -13px; background:#243329; border-bottom:1px solid #526448; box-shadow:0 5px 16px #0006; font-weight:850; font-size:.87rem; } .mobile-hud strong { font-size:1.26rem; color:var(--lime); font-variant-numeric:tabular-nums; } .mobile-hud span:last-child { font-size:.75rem; color:#bbcbbc; font-weight:700; } .mobile-check { display:block; position:fixed; bottom:13px; left:13px; right:13px; width:calc(100% - 26px); z-index:20; padding:15px; background:var(--lime); color:#182319; font-weight:850; border:1px solid #e2ffa1; border-radius:11px; box-shadow:0 10px 30px #000b; } body {padding-bottom:78px;} .shell { width:min(100% - 26px,1200px); } .topbar { padding:20px 0; } .top-note { font-size:.59rem; text-align:right; } .intro { padding:28px 0 22px; } h1 { font-size:2.55rem; } .lede { font-size:.93rem; } .score { min-width:77px; padding:10px 12px; } .card-content { padding:19px; } .target strong { font-size:5.1rem; } .rack { grid-template-columns:repeat(2,minmax(0,1fr)); } .rack-btn[data-weight="1.25"] { grid-column:span 2; } .sleeve-well { min-height:195px; padding:12px 8px; } .bar-inner { flex-basis:32px; } .mounted { max-height:143px; } .actions { flex-direction:column; } .primary { min-height:56px; } .secondary { min-height:46px; } }
+    @media (prefers-reduced-motion: reduce) { *,*:before,*:after { transition:none!important; scroll-behavior:auto!important; } }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <div class="brand"><span class="brand-logo" aria-hidden="true"><i></i><i></i><i></i></span> PLATEWISE</div>
+      <span class="top-note">BARBELL LOADING // PRACTICE LAB</span>
+    </header>
+    <div class="mobile-hud"><span>TARGET <strong id="mobile-target">135</strong> LB</span><span id="mobile-plates">0 plates selected</span></div>
+
+    <section class="intro" aria-label="Introduction and results">
+      <div>
+        <p class="eyebrow">Train your plate math</p>
+        <h1>Load one side.<br />Hit the number.</h1>
+        <p class="lede">You get the target. You pick the plates for <strong>one side</strong> of the bar. The other side is always loaded to match.</p>
+      </div>
+      <div class="scores" aria-label="Game statistics">
+        <div class="score"><b id="solved">0</b><span>Solved</span></div>
+        <div class="score"><b id="streak">0</b><span>Streak</span></div>
+        <div class="score"><b id="best">0</b><span>Best</span></div>
+      </div>
+    </section>
+
+    <main class="workspace">
+      <section class="card" aria-label="Quiz">
+        <div class="card-content">
+          <div class="section-heading"><span class="section-label">01 / Your target</span><span class="tiny-tag">45 LB BAR</span></div>
+          <div class="target" aria-live="polite"><strong id="target">135</strong><small>LB</small></div>
+          <p class="subtext">Total barbell weight, including the bar and both sides.</p>
+
+          <div class="difficulty-wrap" aria-label="Difficulty selection">
+            <label>Weight range</label>
+            <div class="segment" role="group" aria-label="Weight range">
+              <button type="button" data-difficulty="light" aria-pressed="false">Light</button>
+              <button type="button" data-difficulty="standard" aria-pressed="true">Standard</button>
+              <button type="button" data-difficulty="heavy" aria-pressed="false">Heavy</button>
+            </div>
+          </div>
+
+          <div class="splitter"></div>
+          <div class="section-heading"><span class="section-label">02 / Your bar</span><span class="tiny-tag">ONE SIDE ONLY</span></div>
+          <p class="loading-instruction">Load the plates on this sleeve</p>
+          <p class="loading-detail">Tap a plate on the right to add it. Tap any plate on the bar to remove one.</p>
+          <div class="sleeve-well" aria-label="Visual of one loaded barbell sleeve">
+            <div class="bar-inner" aria-hidden="true"></div>
+            <div class="stopper" aria-hidden="true"></div>
+            <div class="sleeve-plates" id="mounted-plates"><span class="sleeve-empty">EMPTY SLEEVE</span></div>
+            <div class="sleeve-end" aria-hidden="true"></div>
+          </div>
+          <div class="below-sleeve"><span>INTERIOR ← BAR / PLATES → OUTER END</span><span class="plate-count" id="plate-count">0 plates loaded</span></div>
+          <div class="feedback" id="feedback" role="status" aria-live="polite">Start by choosing the plates you'd put on one side.</div>
+          <div class="actions">
+            <button class="primary" id="check" type="button">Check my load <span aria-hidden="true">→</span></button>
+            <button class="secondary" id="clear" type="button">Clear plates</button>
+          </div>
+          <div class="extra-actions">
+            <button class="text-button" id="reveal" type="button">Show a solution / skip</button>
+            <label class="toggle"><input type="checkbox" id="live-toggle" /> Show running total</label>
+            <span id="live-weight" class="live-weight" aria-live="polite" hidden></span>
+          </div>
+        </div>
+      </section>
+
+      <aside class="card" aria-label="Plate rack">
+        <div class="card-content">
+          <div class="rack-header">
+            <span class="section-label">03 / Plate rack</span>
+            <h2>Pick your plates</h2>
+            <p>All weights are in pounds. Each tap adds <strong>one plate to one side</strong>.</p>
+          </div>
+          <div id="rack" class="rack">
+            <button class="rack-btn" type="button" data-weight="45" aria-label="Add 45 pound plate"><span><strong>45</strong><small>ADD PLATE +</small></span><i class="rack-dot" aria-hidden="true" style="background:#4b80c0"></i></button>
+            <button class="rack-btn" type="button" data-weight="35" aria-label="Add 35 pound plate"><span><strong>35</strong><small>ADD PLATE +</small></span><i class="rack-dot" aria-hidden="true" style="background:#d3a34d"></i></button>
+            <button class="rack-btn" type="button" data-weight="25" aria-label="Add 25 pound plate"><span><strong>25</strong><small>ADD PLATE +</small></span><i class="rack-dot" aria-hidden="true" style="background:#67ab77"></i></button>
+            <button class="rack-btn" type="button" data-weight="10" aria-label="Add 10 pound plate"><span><strong>10</strong><small>ADD PLATE +</small></span><i class="rack-dot" aria-hidden="true" style="background:#9569b2"></i></button>
+            <button class="rack-btn" type="button" data-weight="5" aria-label="Add 5 pound plate"><span><strong>5</strong><small>ADD PLATE +</small></span><i class="rack-dot" aria-hidden="true" style="background:#c96360"></i></button>
+            <button class="rack-btn" type="button" data-weight="2.5" aria-label="Add 2.5 pound plate"><span><strong>2.5</strong><small>ADD PLATE +</small></span><i class="rack-dot" aria-hidden="true" style="background:#839498"></i></button>
+            <button class="rack-btn" type="button" data-weight="1.25" aria-label="Add 1.25 pound plate"><span><strong>1.25</strong><small>ADD PLATE +</small></span><i class="rack-dot" aria-hidden="true" style="background:#b77d95"></i></button>
+          </div>
+          <div class="rack-callout"><strong>The rule:</strong> Total weight = 45 lb bar + 2 × the plates you load on this side. Standard questions rarely require the small fractional plates.</div>
+        </div>
+      </aside>
+    </main>
+    <button class="mobile-check" type="button" id="mobile-check">Check my load →</button>
+    <footer><span>PLATEWISE · A simple, offline-capable practice quiz</span><span>No sign-in. No tracking. Just plate math.</span></footer>
+  </div>
+
+  <script>
+    'use strict';
+    const BAR = 45;
+    const PLATES = [
+      { weight:45, width:52, height:152, color:'#4b80c0' },
+      { weight:35, width:48, height:137, color:'#d3a34d' },
+      { weight:25, width:43, height:121, color:'#67ab77' },
+      { weight:10, width:38, height:106, color:'#9569b2' },
+      { weight:5, width:35, height:89, color:'#c96360' },
+      { weight:2.5, width:30, height:76, color:'#839498' },
+      { weight:1.25, width:28, height:67, color:'#b77d95' }
+    ];
+    const DIFFICULTIES = {
+      light: { min:65, max:185 },
+      standard: { min:95, max:315 },
+      heavy: { min:225, max:495 }
+    };
+    const els = Object.fromEntries(['target','mounted-plates','plate-count','feedback','check','clear','reveal','solved','streak','best','rack','live-toggle','live-weight','mobile-target','mobile-plates','mobile-check'].map(id => [id, document.getElementById(id)]));
+    let difficulty = 'standard';
+    let target = 135;
+    let loaded = [];
+    let finished = false;
+    let solved = 0;
+    let streak = 0;
+    let best = 0;
+    try { best = Math.max(0, Number(localStorage.getItem('platewise-best') || '0') || 0); } catch (_) { /* Local file may disable storage. */ }
+
+    function nice(n) { return Number.isInteger(n) ? String(n) : n.toFixed(2).replace(/0+$/, '').replace(/\.$/, ''); }
+    function sideWeight() { return loaded.reduce((sum,w) => sum + w, 0); }
+    function totalWeight() { return BAR + 2 * sideWeight(); }
+    function feedback(message,state='info') { els.feedback.textContent = message; els.feedback.dataset.state = state; }
+    function updateStats() { els.solved.textContent = solved; els.streak.textContent = streak; els.best.textContent = best; }
+    function render() {
+      els['mounted-plates'].replaceChildren();
+      if (!loaded.length) {
+        const empty = document.createElement('span'); empty.className='sleeve-empty'; empty.textContent='EMPTY SLEEVE';
+        els['mounted-plates'].append(empty);
+      } else {
+        loaded.slice().sort((a,b)=>b-a).forEach(weight => {
+          const plate = PLATES.find(p=>p.weight===weight);
+          const el = document.createElement('button');
+          el.type='button'; el.className='mounted'; el.title=`Remove one ${nice(weight)} lb plate`;
+          el.setAttribute('aria-label', `Remove one ${nice(weight)} pound plate`);
+          el.style.width=plate.width+'px'; el.style.height=plate.height+'px'; el.style.background=plate.color;
+          el.disabled=finished;
+          const label=document.createElement('span'); label.textContent=nice(weight); el.append(label);
+          el.addEventListener('click',()=>removePlate(weight));
+          els['mounted-plates'].append(el);
+        });
+      }
+      els['plate-count'].textContent = `${loaded.length} plate${loaded.length === 1 ? '' : 's'} loaded`;
+      els['mobile-plates'].textContent = `${loaded.length} plate${loaded.length === 1 ? '' : 's'} selected`;
+      els.check.textContent = finished ? 'Next target →' : 'Check my load →';
+      els['mobile-check'].textContent = finished ? 'Next target →' : 'Check my load →';
+      els.clear.disabled = finished || !loaded.length;
+      els.reveal.disabled = finished;
+      els.rack.querySelectorAll('[data-weight]').forEach(b=> b.disabled=finished);
+      els['live-weight'].hidden = !els['live-toggle'].checked;
+      els['live-weight'].textContent = `Total: ${nice(totalWeight())} lb`;
+    }
+    function addPlate(weight) { if(finished) return; loaded.push(weight); render(); feedback('Plates added. Check when you are ready.'); }
+    function removePlate(weight) { if(finished) return; const idx=loaded.indexOf(weight); if(idx>=0)loaded.splice(idx,1); render(); feedback('Plate removed. Keep going.'); }
+    function chooseTarget() {
+      const range = DIFFICULTIES[difficulty];
+      const minSteps = Math.ceil((range.min-BAR)/10);
+      const maxSteps = Math.floor((range.max-BAR)/10);
+      const last = target;
+      for (let i=0;i<12;i++) {
+        const steps = minSteps + Math.floor(Math.random()*(maxSteps-minSteps+1));
+        const roll = Math.random();
+        // ~4% require a 2.5 lb plate per side, ~1% a 1.25 lb plate per side.
+        const extra = roll < .01 ? 2.5 : roll < .05 ? 5 : 0;
+        target = BAR + 10*steps + extra;
+        if(target!==last) break;
+      }
+      loaded=[]; finished=false;
+      els.target.textContent=nice(target);
+      els['mobile-target'].textContent=nice(target);
+      feedback('Start by choosing the plates you\'d put on one side.');
+      render();
+    }
+    function solveOneSide(total) {
+      // Exact minimum-plate solution with unlimited plates; integer units of 1.25 lb.
+      const units = Math.round(((total - BAR) / 2) / 1.25);
+      const options = PLATES.map(p => ({...p, units:Math.round(p.weight/1.25)}));
+      const dp = Array(units+1).fill(Infinity);
+      const prev = Array(units+1).fill(null);
+      dp[0] = 0;
+      for(let amount=1;amount<=units;amount++){
+        for(const p of options){
+          if(amount>=p.units && dp[amount-p.units]+1<dp[amount]){
+            dp[amount]=dp[amount-p.units]+1; prev[amount]=p;
+          }
+        }
+      }
+      if(!Number.isFinite(dp[units])) return [];
+      let a=units; const result=[];
+      while(a>0){result.push(prev[a].weight); a-=prev[a].units;}
+      return result;
+    }
+    function check() {
+      if(finished) { chooseTarget(); return; }
+      if(!loaded.length) { feedback('Add at least one plate to the sleeve first.', 'error'); return; }
+      const diff=totalWeight()-target;
+      if(Math.abs(diff)<0.001){
+        solved++; streak++; best=Math.max(best,streak);
+        try {localStorage.setItem('platewise-best',String(best));}catch(_){}
+        updateStats(); finished=true;
+        feedback(`Correct! ${BAR} lb bar + 2 × ${nice(sideWeight())} lb = ${nice(target)} lb.`, 'success');
+        render();
+      } else {
+        feedback(`Not quite. Your bar would be ${nice(Math.abs(diff))} lb ${diff>0?'too heavy':'too light'} overall. Remember: each plate you add counts on BOTH sides.`, 'error');
+      }
+    }
+    function reveal() {
+      if(finished) return;
+      const solution=solveOneSide(target);
+      const breakdown=solution.map(w=>nice(w)).join(' + ');
+      streak=0; updateStats(); finished=true;
+      feedback(`One correct load per side: ${breakdown} lb. ${BAR} + 2 × (${breakdown}) = ${nice(target)} lb.`, 'reveal');
+      render();
+    }
+    els.rack.querySelectorAll('[data-weight]').forEach(button => button.addEventListener('click',()=>addPlate(Number(button.dataset.weight))));
+    els.check.addEventListener('click',check);
+    els['mobile-check'].addEventListener('click',()=>{ const previouslyFinished=finished; check(); if(previouslyFinished) window.scrollTo({top:0,behavior:'smooth'}); else els.feedback.scrollIntoView({behavior:'smooth',block:'center'}); });
+    els.clear.addEventListener('click',()=>{loaded=[];render(); feedback('Bar cleared. Choose your plates.');});
+    els.reveal.addEventListener('click',reveal);
+    els['live-toggle'].addEventListener('change',render);
+    document.querySelectorAll('[data-difficulty]').forEach(button=>button.addEventListener('click',()=>{
+      const next=button.dataset.difficulty;
+      if(next===difficulty) return;
+      difficulty=next;
+      document.querySelectorAll('[data-difficulty]').forEach(b=>b.setAttribute('aria-pressed',String(b===button)));
+      streak=0; updateStats(); chooseTarget();
+    }));
+    updateStats(); chooseTarget();
+    // Expose a small pure testing surface without affecting gameplay.
+    window.PlatewiseTest = { solveOneSide, getTarget:()=>target, getWeight:totalWeight, getDifficulty:()=>difficulty };
+  </script>
+</body>
+</html>
