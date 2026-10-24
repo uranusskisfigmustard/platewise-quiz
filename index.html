@@ -75,6 +75,7 @@
     .feedback[data-state="success"] { background:#273e28; color:#dcffbc; border-color:#66875c; }
     .feedback[data-state="error"] { background:#402a26; color:#ffd4c9; border-color:#805249; }
     .feedback[data-state="reveal"] { background:#323328; color:#fff1c2; border-color:#665f3c; }
+    .feedback[data-state="improve"] { background:#3b3421; color:#ffe7a7; border-color:#867547; }
     .actions { display:flex; gap:10px; margin-top:16px; }
     .primary, .secondary, .text-button { display:inline-flex; justify-content:center; align-items:center; gap:8px; border-radius:10px; padding:15px 18px; font-weight:850; }
     .primary { flex:1; background:var(--lime); border:1px solid var(--lime); color:#182319; }
@@ -185,7 +186,7 @@
         <div class="card-content">
           <div class="section-heading"><span class="section-label">01 / Your target</span><span class="tiny-tag">45 LB BAR</span></div>
           <div class="target" aria-live="polite"><strong id="target">135</strong><small>LB</small></div>
-          <p class="subtext">Total barbell weight, including the bar and both sides.</p>
+          <p class="subtext">Total barbell weight, including the bar and both sides. Use the fewest plates possible per side.</p>
 
           <div class="difficulty-wrap" aria-label="Difficulty selection">
             <label>Weight range</label>
@@ -244,7 +245,7 @@
             <div id="selected-chips" class="selected-chips"><span class="selected-empty">No plates added yet</span></div>
             <button type="button" id="rack-clear" class="rack-clear" disabled>Clear all plates</button>
           </div>
-          <div class="rack-callout"><strong>The rule:</strong> Total weight = 45 lb bar + 2 × the plates you load on this side. Standard questions rarely require the small fractional plates.</div>
+          <div class="rack-callout"><strong>The rule:</strong> Total weight = 45 lb bar + 2 × the plates you load on this side. To earn a correct answer, use the <strong>fewest plates per side</strong>. Any combination with the minimum plate count counts. Small fractional plates are rarely needed.</div>
         </div>
       </aside>
     </main>
@@ -388,10 +389,18 @@
       if(!loaded.length) { feedback('Add at least one plate to the sleeve first.', 'error'); return; }
       const diff=totalWeight()-target;
       if(Math.abs(diff)<0.001){
+        const optimal = solveOneSide(target);
+        // A valid load must reach the target with the minimum number of plates
+        // on the displayed side. Other minimum-count combinations also count.
+        if (loaded.length > optimal.length) {
+          const example = optimal.map(w => nice(w)).join(' + ');
+          feedback(`Right weight, but you used ${loaded.length} plates per side. You can do it with ${optimal.length}: ${example} lb per side. Try a more efficient load to earn the point.`, 'improve');
+          return;
+        }
         solved++; streak++; best=Math.max(best,streak);
         try {localStorage.setItem('platewise-best',String(best));}catch(_){}
         updateStats(); finished=true;
-        feedback(`Correct! ${BAR} lb bar + 2 × ${nice(sideWeight())} lb = ${nice(target)} lb.`, 'success');
+        feedback(`Optimal load! ${BAR} lb bar + 2 × ${nice(sideWeight())} lb = ${nice(target)} lb, using the minimum ${loaded.length} plate${loaded.length === 1 ? '' : 's'} per side.`, 'success');
         render();
       } else {
         feedback(`Not quite. Your bar would be ${nice(Math.abs(diff))} lb ${diff>0?'too heavy':'too light'} overall. Remember: each plate you add counts on BOTH sides.`, 'error');
@@ -402,7 +411,7 @@
       const solution=solveOneSide(target);
       const breakdown=solution.map(w=>nice(w)).join(' + ');
       streak=0; updateStats(); finished=true;
-      feedback(`One correct load per side: ${breakdown} lb. ${BAR} + 2 × (${breakdown}) = ${nice(target)} lb.`, 'reveal');
+      feedback(`An optimal load (${solution.length} plate${solution.length === 1 ? '' : 's'} per side): ${breakdown} lb. ${BAR} + 2 × (${breakdown}) = ${nice(target)} lb.`, 'reveal');
       render();
     }
     els.rack.querySelectorAll('[data-weight]').forEach(button => button.addEventListener('click',()=>addPlate(Number(button.dataset.weight))));
