@@ -203,7 +203,7 @@
         <div class="card-content">
           <div class="section-heading"><span class="section-label">02 / Your bar</span><span class="tiny-tag">ONE SIDE ONLY</span></div>
           <p class="loading-instruction">Load the plates on this sleeve</p>
-          <p class="loading-detail">Select a plate from the rack to add it. Tap any plate on the bar to remove one.</p>
+          <p class="loading-detail">Add plates heaviest to lightest, starting at the bar center. Tap a plate on the bar to remove it.</p>
           <div class="sleeve-well" aria-label="Visual of one loaded barbell sleeve">
             <div class="bar-inner" aria-hidden="true"></div>
             <div class="stopper" aria-hidden="true"></div>
@@ -229,7 +229,7 @@
           <div class="rack-header">
             <span class="section-label">03 / Plate rack</span>
             <h2>Pick your plates</h2>
-            <p>All weights are in pounds. Each tap adds <strong>one plate to one side</strong>.</p>
+            <p>All weights are in pounds. Each tap adds <strong>one plate to one side</strong>. Start with the heaviest plate and work outward.</p>
           </div>
           <div id="rack" class="rack">
             <button class="rack-btn" type="button" data-weight="45" aria-label="Add 45 pound plate"><span><strong>45</strong><small>ADD PLATE +</small></span><i class="rack-dot" aria-hidden="true" style="background:#4b80c0"></i></button>
@@ -291,7 +291,8 @@
         const empty = document.createElement('span'); empty.className='sleeve-empty'; empty.textContent='EMPTY SLEEVE';
         els['mounted-plates'].append(empty);
       } else {
-        loaded.slice().sort((a,b)=>b-a).forEach(weight => {
+        // Plates are added in descending order: the first/heaviest sits closest to the bar center (left).
+        loaded.forEach(weight => {
           const plate = PLATES.find(p=>p.weight===weight);
           const el = document.createElement('button');
           el.type='button'; el.className='mounted'; el.title=`Remove one ${nice(weight)} lb plate`;
@@ -344,7 +345,20 @@
       els['live-weight'].hidden = !els['live-toggle'].checked;
       els['live-weight'].textContent = `Total: ${nice(totalWeight())} lb`;
     }
-    function addPlate(weight) { if(finished) return; loaded.push(weight); render(); feedback('Plates added. Check when you are ready.'); }
+    function canAppendPlate(weight) {
+      // Never insert a heavier plate outside one that is already mounted.
+      return !loaded.length || weight <= loaded[loaded.length - 1];
+    }
+    function addPlate(weight) {
+      if(finished) return;
+      if(!canAppendPlate(weight)) {
+        feedback('Load heaviest to lightest. Remove the smaller plate at the outer end before adding a heavier one.', 'error');
+        return;
+      }
+      loaded.push(weight);
+      render();
+      feedback('Plate added. Check when you are ready.');
+    }
     function removePlate(weight) { if(finished) return; const idx=loaded.indexOf(weight); if(idx>=0)loaded.splice(idx,1); render(); feedback('Plate removed. Keep going.'); }
     function chooseTarget() {
       const range = DIFFICULTIES[difficulty];
@@ -393,8 +407,7 @@
         // A valid load must reach the target with the minimum number of plates
         // on the displayed side. Other minimum-count combinations also count.
         if (loaded.length > optimal.length) {
-          const example = optimal.map(w => nice(w)).join(' + ');
-          feedback(`Right weight, but you used ${loaded.length} plates per side. You can do it with ${optimal.length}: ${example} lb per side. Try a more efficient load to earn the point.`, 'improve');
+          feedback('Correct weight, but this load can be improved. Try using fewer plates per side.', 'improve');
           return;
         }
         solved++; streak++; best=Math.max(best,streak);
