@@ -352,7 +352,7 @@
     function addPlate(weight) {
       if(finished) return;
       if(!canAppendPlate(weight)) {
-        feedback('Load heaviest to lightest. Remove the smaller plate at the outer end before adding a heavier one.', 'error');
+        feedback('Cannot add a heavier plate outside a lighter one. Remove the lighter plates first, then add the heavier plate.', 'error');
         return;
       }
       loaded.push(weight);
